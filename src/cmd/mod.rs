@@ -50,21 +50,21 @@ pub struct Flag {
     /// # Example
     ///
     /// f
-    short: String,
+    pub short: String,
     /// Flag long identifier
     ///
     /// # Example
     ///
     /// ferris
-    long: String,
+    pub long: String,
     /// Flag description
     ///
     /// # Example
     ///
     /// say hello from ferris
     description: String,
-    /// Represents this flag is provided or not, `false` by default
-    has: bool,
+    /// Flag value
+    pub value: Option<String>,
 }
 
 impl Command {
@@ -104,12 +104,14 @@ impl Command {
         command
     }
 
-    /// Add a new flag for command with the arguments provided and the `has` filed set to `false`
+    /// Add a new flag for command with the arguments provided and the `value` filed set to `None`
     ///
     /// # Arguments
     ///
     /// `short` - A string slice that holds the short identifier of the flag
+    ///
     /// `long` - A string slice that holds the long identifier of the flag
+    ///
     /// `description` - A string slice that holds the description of the flag
     ///
     /// # Examples
@@ -122,7 +124,7 @@ impl Command {
             short: String::from(short),
             long: String::from(long),
             description: String::from(description),
-            has: false,
+            value: None,
         });
     }
 }
@@ -198,7 +200,7 @@ impl Command {
                 if *arg == format!("{}{}", FLAG_SHORT_START, flag.short)
                     || *arg == format!("{}{}", FLAG_LONG_START, flag.long)
                 {
-                    flag.has = true;
+                    flag.value = Some(true.to_string());
                 }
             }
         }
@@ -245,7 +247,7 @@ impl Command {
         let mut exit = false;
 
         for flag in self.flags.iter() {
-            if flag.has && flag.short == HELP_SHORT {
+            if flag.value.is_some() && flag.short == HELP_SHORT {
                 self.help();
                 exit = true;
                 break;
@@ -262,7 +264,7 @@ impl Command {
         let mut exit = false;
 
         for flag in self.flags.iter() {
-            if flag.has && flag.short == VERSION_SHORT {
+            if flag.value.is_some() && flag.short == VERSION_SHORT {
                 self.version();
                 exit = true;
                 break;
