@@ -29,15 +29,21 @@ pub struct Command {
     flags: Vec<Flag>,
     /// Command execution logic
     ///
+    /// # Arguments
+    ///
+    /// `text` - An optional string that holds input text
+    /// `flags` - A vector of Flag that holds added flags without help or version
+    ///
     /// # Example
     ///
     /// ```
-    /// |text| { println!("hello, {}!", text.unwrap()); }
+    /// |text, flags| { println!("hello, {}!", text.unwrap()); }
     /// ```
-    run: fn(Option<String>),
+    run: fn(text: Option<String>, flags: Vec<&Flag>),
 }
 
 /// A command flag type
+#[derive(Debug)]
 pub struct Flag {
     /// Flag short identifier
     ///
@@ -73,11 +79,11 @@ impl Command {
     /// # Examples
     ///
     /// ```
-    /// let mut command = Command::new("gives a friendly hello", "hello TEXT", |text| {
+    /// let mut command = Command::new("gives a friendly hello", "hello TEXT", |text, flags| {
     ///     println!("hello, {}!", text.unwrap());
     /// });
     /// ```
-    pub fn new(description: &str, usage: &str, run: fn(Option<String>)) -> Self {
+    pub fn new(description: &str, usage: &str, run: fn(Option<String>, Vec<&Flag>)) -> Self {
         let mut command = Command {
             description: String::from(description),
             usage: String::from(usage),
@@ -127,15 +133,15 @@ impl Command {
     /// # Example
     ///
     /// ```
-    /// let mut command = Command::new("gives a friendly hello", "hello TEXT", |text| {
-    ///     println!("hello, {}!", text.unwrap());
+    /// let mut command = Command::new("gives a friendly hello", "hello TEXT", |text, flags| {
+    ///     todo!();
     /// });
     /// command.execute();
     /// ```
     pub fn execute(&mut self) {
         let args = self.get_args();
 
-        let args = self.set_flags(args.iter().map(|x| &x[..]).collect());
+        let args = self.update_flags(args.iter().map(|x| &x[..]).collect());
 
         if self.help_exit() {
             return;
@@ -145,7 +151,8 @@ impl Command {
         }
 
         let input = &args[1];
-        (self.run)(Some(String::from(input)));
+        let flags = self.get_flags();
+        (self.run)(Some(String::from(input)), flags);
     }
 
     /// Get args from env
@@ -157,7 +164,7 @@ impl Command {
         args
     }
 
-    /// Set flags by giving args and returns simple args vector without any flag
+    /// Update flags value by giving args and returns simple args vector without any flag
     ///
     /// # Arguments
     ///
@@ -179,7 +186,7 @@ impl Command {
     /// //     "world",
     /// // ]
     /// ```
-    fn set_flags(&mut self, args: Vec<&str>) -> Vec<String> {
+    fn update_flags(&mut self, args: Vec<&str>) -> Vec<String> {
         let mut simple_args: Vec<String> = vec![];
 
         for arg in args {
@@ -197,6 +204,38 @@ impl Command {
         }
 
         simple_args
+    }
+
+    /// Returns added flags without help or version
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// // returns empty flag vector when not providing any flag
+    /// let mut command = Command::new("gives a friendly hello", "hello TEXT", |text, flags| {
+    ///     todo!();
+    /// });
+    /// let flags = command.get_flags();
+    /// assert_eq!(0, flags.len());
+    ///
+    /// // returns non empty flag vector when providing flag
+    /// let mut command = Command::new("gives a friendly hello", "hello TEXT", |text, flags| {
+    ///     todo!();
+    /// });
+    /// command.add_flag("f", "ferris", "say hello from ferris");
+    /// let flags = command.get_flags();
+    /// assert_eq!(1, flags.len());
+    /// ```
+    fn get_flags(&self) -> Vec<&Flag> {
+        let mut simple_flags: Vec<&Flag> = vec![];
+
+        for flag in self.flags.iter() {
+            if !(flag.short == HELP_SHORT || flag.short == VERSION_SHORT) {
+                simple_flags.push(flag);
+            }
+        }
+
+        simple_flags
     }
 
     /// Check if help needed to display and exit,

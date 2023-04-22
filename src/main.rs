@@ -4,8 +4,8 @@ use cmd::Command;
 use qrcode::QrCode;
 
 fn main() {
-    let mut root_command = Command::new("generate qr code", "qr TEXT", |input| {
-        let data = input.unwrap();
+    let mut root_command = Command::new("generate qr code", "qr TEXT", |text, flags| {
+        let data = text.unwrap();
         let code = QrCode::new(data).unwrap();
         let qr_string = code
             .render::<char>()
