@@ -157,7 +157,7 @@ impl Command {
         args
     }
 
-    /// Set flags by giving args and returns modified args vector without any flag
+    /// Set flags by giving args and returns simple args vector without any flag
     ///
     /// # Arguments
     ///
@@ -179,10 +179,12 @@ impl Command {
     /// //     "world",
     /// // ]
     /// ```
-    fn set_flags(&mut self, mut args: Vec<&str>) -> Vec<String> {
-        for i in 0..args.len() {
-            let arg = args[i];
+    fn set_flags(&mut self, args: Vec<&str>) -> Vec<String> {
+        let mut simple_args: Vec<String> = vec![];
+
+        for arg in args {
             if !(arg.starts_with(FLAG_SHORT_START) || arg.starts_with(FLAG_LONG_START)) {
+                simple_args.push(String::from(arg));
                 continue;
             }
             for mut flag in self.flags.iter_mut() {
@@ -190,13 +192,11 @@ impl Command {
                     || *arg == format!("{}{}", FLAG_LONG_START, flag.long)
                 {
                     flag.has = true;
-                    args.remove(i);
                 }
             }
         }
 
-        let args: Vec<String> = args.iter().map(|x| String::from(*x)).collect();
-        args
+        simple_args
     }
 
     /// Check if help needed to display and exit,
