@@ -42,11 +42,46 @@ pub struct Command {
     run: fn(text: Option<String>, flags: Vec<&Flag>),
 }
 
+/// An enum that represents for flag value, which includes boolean, string, int and float
+/// 
+/// # Example
+/// 
+/// ```
+/// let value = FlagValue::Bool(true);
+/// ```
 #[derive(Debug)]
 pub enum FlagValue {
+    /// An boolean enum that represents for `bool` flag value
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// let value = FlagValue::Bool(true);
+    /// ```
     Bool(bool),
+    /// A string enum that represents for `String` flag value
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// let value = FlagValue::String(String::from("Hello, world!"));
+    /// ```
     String(String),
+    /// An int enum that represents for `i32` flag value
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// let value = FlagValue::Int(3);
+    /// ```
     Int(i32),
+    /// A float enum that represents for `f32` flag value
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// let value = FlagValue::Float(2.7);
+    /// ```
     Float(f32),
 }
 
@@ -72,6 +107,16 @@ pub struct Flag {
     /// say hello from ferris
     description: String,
     /// Flag value
+    /// 
+    /// # Default values
+    /// 
+    /// `FlagValue::Bool` - default value is `false`
+    /// 
+    /// `FlagValue::String` - default value is `""`
+    /// 
+    /// `FlagValue::Int` - default value is `0`
+    /// 
+    /// `FlagValue::Float` - default value is `0.0`
     pub value: FlagValue,
 }
 
