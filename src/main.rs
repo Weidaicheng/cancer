@@ -1,6 +1,6 @@
 mod cmd;
 
-use cmd::Command;
+use cmd::command::Command;
 use qrcode::QrCode;
 
 fn main() {
