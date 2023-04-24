@@ -1,3 +1,5 @@
+use std::fmt;
+
 pub const FLAG_SHORT_START: &str = "-";
 pub const FLAG_LONG_START: &str = "--";
 
@@ -79,6 +81,15 @@ pub struct Flag {
     pub value: FlagValue,
 }
 
+impl fmt::Display for Flag {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_fmt(format_args!(
+            "  {}{}, {}{}\t{}",
+            FLAG_SHORT_START, self.short, FLAG_LONG_START, self.long, self.description
+        ))
+    }
+}
+
 impl Flag {
     /// Returns a flag with the arguments provided
     ///
@@ -105,4 +116,55 @@ impl Flag {
             value,
         }
     }
+}
+
+impl Flag {
+    /// Returns if provided arg match flag
+    ///
+    /// # Arguments
+    ///
+    /// `arg` - A string slice that holds argument that needs to check
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// // matched scenario
+    /// let flag = Flag::new("f", "ferris", "say hello from ferris", FlagValue::Bool(false));
+    /// let result = flag.is_match("-f");
+    ///
+    /// assert_eq!(true, result);
+    ///
+    /// // non-matched scenario
+    /// let flag = Flag::new("f", "ferris", "say hello from ferris", FlagValue::Bool(false));
+    /// let result = flag.is_match("--rollercoaster");
+    ///
+    /// assert_eq!(false, result);
+    /// ```
+    pub fn is_match(&self, arg: &str) -> bool {
+        arg == format!("{}{}", FLAG_SHORT_START, self.short)
+            || arg == format!("{}{}", FLAG_LONG_START, self.long)
+    }
+}
+
+/// Returns if provided arg is a flag
+///
+/// # Arguments
+///
+/// `arg` - A string slice that holds argument that needs to check
+///
+/// # Examples
+///
+/// ```
+/// // flag scenario
+/// let result = is_flag("-f");
+///
+/// assert_eq!(true, result);
+///
+/// // not flag scenario
+/// let result = is_flag("f");
+///
+/// assert_eq!(false, result);
+/// ```
+pub fn is_flag(arg: &str) -> bool {
+    arg.starts_with(FLAG_SHORT_START) || arg.starts_with(FLAG_LONG_START)
 }

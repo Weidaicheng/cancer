@@ -2,7 +2,7 @@ use std::env;
 
 use crate::cmd::{PKG_NAME, PKG_VERSION};
 
-use super::flag::{Flag, FlagValue, FLAG_LONG_START, FLAG_SHORT_START};
+use super::flag::{is_flag, Flag, FlagValue};
 
 const HELP_SHORT: &str = "h";
 const HELP_LONG: &str = "help";
@@ -206,6 +206,11 @@ impl Command {
             return;
         }
 
+        if args.len() <= 1 {
+            self.help();
+            return;
+        }
+
         let input = &args[1];
         let flags = self.get_flags();
         (self.run)(Some(String::from(input)), flags);
@@ -213,11 +218,7 @@ impl Command {
 
     /// Get args from env
     fn get_args(&self) -> Vec<String> {
-        let mut args: Vec<String> = env::args().collect();
-        if args.len() <= 1 {
-            args.push(format!("{}{}", FLAG_SHORT_START, HELP_SHORT));
-        }
-        args
+        env::args().collect()
     }
 
     /// Update flags value by giving args and returns simple args vector without any flag
@@ -246,14 +247,12 @@ impl Command {
         let mut simple_args: Vec<String> = vec![];
 
         for arg in args {
-            if !(arg.starts_with(FLAG_SHORT_START) || arg.starts_with(FLAG_LONG_START)) {
+            if !(is_flag(arg)) {
                 simple_args.push(String::from(arg));
                 continue;
             }
             for mut flag in self.flags.iter_mut() {
-                if *arg == format!("{}{}", FLAG_SHORT_START, flag.short)
-                    || *arg == format!("{}{}", FLAG_LONG_START, flag.long)
-                {
+                if flag.is_match(arg) {
                     flag.value = FlagValue::Bool(true);
                 }
             }
@@ -366,10 +365,7 @@ impl Command {
         println!();
         println!("Flags:");
         for flag in self.flags.iter() {
-            println!(
-                "  {}{}, {}{}\t{}",
-                FLAG_SHORT_START, flag.short, FLAG_LONG_START, flag.long, flag.description
-            )
+            println!("{}", flag);
         }
     }
 
