@@ -42,6 +42,14 @@ pub struct Command {
     run: fn(text: Option<String>, flags: Vec<&Flag>),
 }
 
+#[derive(Debug)]
+pub enum FlagValue {
+    Bool(bool),
+    String(String),
+    Int(i32),
+    Float(f32),
+}
+
 /// A command flag type
 #[derive(Debug)]
 pub struct Flag {
@@ -64,7 +72,7 @@ pub struct Flag {
     /// say hello from ferris
     description: String,
     /// Flag value
-    pub value: Option<String>,
+    pub value: FlagValue,
 }
 
 impl Command {
@@ -90,12 +98,12 @@ impl Command {
             run,
             flags: vec![],
         };
-        command.add_flag(
+        command.add_boolean_flag(
             HELP_SHORT,
             HELP_LONG,
             format!("help for {}", PKG_NAME).as_str(),
         );
-        command.add_flag(
+        command.add_boolean_flag(
             VERSION_SHORT,
             VERSION_LONG,
             format!("version for {}", PKG_NAME).as_str(),
@@ -103,8 +111,36 @@ impl Command {
 
         command
     }
+}
 
-    /// Add a new flag for command with the arguments provided and the `value` filed set to `None`
+impl Command {
+    /// Add a new flag for command with the arguments provided
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier of the flag
+    ///
+    /// `long` - A string slice that holds the long identifier of the flag
+    ///
+    /// `description` - A string slice that holds the description of the flag
+    ///
+    /// `default_value` - A enum that holds the default value of the flag
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// command.add_flag("f", "ferris", "say hello from ferris", FlagValue::Bool(false));
+    /// ```
+    fn add_flag(&mut self, short: &str, long: &str, description: &str, default_value: FlagValue) {
+        self.flags.push(Flag {
+            short: String::from(short),
+            long: String::from(long),
+            description: String::from(description),
+            value: default_value,
+        });
+    }
+
+    /// Add a boolean flag for command with the arguments provided and value set to `false` by default
     ///
     /// # Arguments
     ///
@@ -117,15 +153,72 @@ impl Command {
     /// # Examples
     ///
     /// ```
-    /// command.add_flag("f", "ferris", "say hello from ferris");
+    /// command.add_boolean_flag("f", "ferris", "say hello from ferris");
     /// ```
-    pub fn add_flag(&mut self, short: &str, long: &str, description: &str) {
-        self.flags.push(Flag {
-            short: String::from(short),
-            long: String::from(long),
-            description: String::from(description),
-            value: None,
-        });
+    pub fn add_boolean_flag(&mut self, short: &str, long: &str, description: &str) {
+        self.add_flag(short, long, description, FlagValue::Bool(false));
+    }
+
+    /// Add a string flag for command with the arguments provided and value set to `""` by default
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier of the flag
+    ///
+    /// `long` - A string slice that holds the long identifier of the flag
+    ///
+    /// `description` - A string slice that holds the description of the flag
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// command.add_string_flag("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn add_string_flag(&mut self, short: &str, long: &str, description: &str) {
+        self.add_flag(
+            short,
+            long,
+            description,
+            FlagValue::String(String::from("")),
+        );
+    }
+
+    /// Add a int flag for command with the arguments provided and value set to `0` by default
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier of the flag
+    ///
+    /// `long` - A string slice that holds the long identifier of the flag
+    ///
+    /// `description` - A string slice that holds the description of the flag
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// command.add_int_flag("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn add_int_flag(&mut self, short: &str, long: &str, description: &str) {
+        self.add_flag(short, long, description, FlagValue::Int(0));
+    }
+
+    /// Add a float flag for command with the arguments provided and value set to `0.0` by default
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier of the flag
+    ///
+    /// `long` - A string slice that holds the long identifier of the flag
+    ///
+    /// `description` - A string slice that holds the description of the flag
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// command.add_float_flag("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn add_float_flag(&mut self, short: &str, long: &str, description: &str) {
+        self.add_flag(short, long, description, FlagValue::Float(0.0));
     }
 }
 
@@ -200,7 +293,7 @@ impl Command {
                 if *arg == format!("{}{}", FLAG_SHORT_START, flag.short)
                     || *arg == format!("{}{}", FLAG_LONG_START, flag.long)
                 {
-                    flag.value = Some(true.to_string());
+                    flag.value = FlagValue::Bool(true);
                 }
             }
         }
@@ -247,10 +340,17 @@ impl Command {
         let mut exit = false;
 
         for flag in self.flags.iter() {
-            if flag.value.is_some() && flag.short == HELP_SHORT {
-                self.help();
-                exit = true;
-                break;
+            if flag.short == HELP_SHORT {
+                match flag.value {
+                    FlagValue::Bool(value) => {
+                        if value {
+                            self.help();
+                            exit = true;
+                            break;
+                        }
+                    }
+                    _ => (),
+                }
             }
         }
 
@@ -264,10 +364,17 @@ impl Command {
         let mut exit = false;
 
         for flag in self.flags.iter() {
-            if flag.value.is_some() && flag.short == VERSION_SHORT {
-                self.version();
-                exit = true;
-                break;
+            if flag.short == VERSION_SHORT {
+                match flag.value {
+                    FlagValue::Bool(value) => {
+                        if value {
+                            self.version();
+                            exit = true;
+                            break;
+                        }
+                    }
+                    _ => (),
+                }
             }
         }
 
