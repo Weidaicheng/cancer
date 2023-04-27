@@ -238,7 +238,7 @@ impl Command {
     /// let args = self.set_flags(args);
     /// dbg!(&args);
     /// // output:
-    /// // [src/cmd/mod.rs:95] &args = [
+    /// // [src/command.rs:95] &args = [
     /// //     "target/debug/hello",
     /// //     "world",
     /// // ]
