@@ -1,6 +1,6 @@
 use std::env;
 
-use crate::cmd::{PKG_NAME, PKG_VERSION};
+use crate::{PKG_NAME, PKG_VERSION};
 
 use super::flag::{is_flag, Flag, FlagValue};
 
