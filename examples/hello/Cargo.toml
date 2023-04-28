@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qr-code-cli = { path = "../.." }
+cancer = { path = "../.." }
 ferris-says = "0.3.1"

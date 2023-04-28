@@ -1,7 +1,7 @@
 use std::io::{stdout, BufWriter};
 
 use ferris_says::say;
-use qr_code_cli::{command::Command, flag::FlagValue};
+use cancer::{command::Command, flag::FlagValue};
 
 fn main() {
     let mut command = Command::new("gives a friendly hello", "hello TEXT", |text, flags| {
