@@ -1,7 +1,10 @@
 use std::io::{stdout, BufWriter};
 
+use cancer::{
+    command::Command,
+    flag::{Flag, FlagValue},
+};
 use ferris_says::say;
-use cancer::{command::Command, flag::FlagValue};
 
 fn main() {
     let mut command = Command::new("gives a friendly hello", "hello TEXT", |text, flags| {
@@ -29,6 +32,6 @@ fn main() {
             println!("{}", message);
         }
     });
-    command.add_boolean_flag("f", "ferris", "say hello from ferris");
+    command.add_flag(Flag::new_bool("f", "ferris", "say hello from ferris"));
     command.execute();
 }

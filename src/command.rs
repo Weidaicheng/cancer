@@ -73,123 +73,35 @@ impl Command {
             help_render: Box::new(DefaultHelpRender::new()),
             version_render: Box::new(DefaultVersionRender::new()),
         };
-        command.add_boolean_flag(
+        command.add_flag(Flag::new_bool(
             HELP_SHORT,
             HELP_LONG,
-            format!("help for {}", PKG_NAME).as_str(),
-        );
-        command.add_boolean_flag(
+            &format!("help for {}", PKG_NAME),
+        ));
+        command.add_flag(Flag::new_bool(
             VERSION_SHORT,
             VERSION_LONG,
-            format!("version for {}", PKG_NAME).as_str(),
-        );
+            &format!("version for {}", PKG_NAME),
+        ));
 
         command
     }
 }
 
 impl Command {
-    /// Add a new flag for command with the arguments provided
+    /// Add a new flag to command
     ///
     /// # Arguments
     ///
-    /// `short` - A string slice that holds the short identifier of the flag
-    ///
-    /// `long` - A string slice that holds the long identifier of the flag
-    ///
-    /// `description` - A string slice that holds the description of the flag
-    ///
-    /// `default_value` - A enum that holds the default value of the flag
+    /// `flag` - A `Flag` object
     ///
     /// # Examples
     ///
     /// ```
-    /// command.add_flag("f", "ferris", "say hello from ferris", FlagValue::Bool(false));
+    /// command.add_flag(Flag::new("f", "ferris", "say hello from ferris", FlagValue::Bool(false)));
     /// ```
-    fn add_flag(&mut self, short: &str, long: &str, description: &str, default_value: FlagValue) {
-        self.flags
-            .push(Flag::new(short, long, description, default_value));
-    }
-
-    /// Add a boolean flag for command with the arguments provided and value set to `false` by default
-    ///
-    /// # Arguments
-    ///
-    /// `short` - A string slice that holds the short identifier of the flag
-    ///
-    /// `long` - A string slice that holds the long identifier of the flag
-    ///
-    /// `description` - A string slice that holds the description of the flag
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// command.add_boolean_flag("f", "ferris", "say hello from ferris");
-    /// ```
-    pub fn add_boolean_flag(&mut self, short: &str, long: &str, description: &str) {
-        self.add_flag(short, long, description, FlagValue::Bool(false));
-    }
-
-    /// Add a string flag for command with the arguments provided and value set to `""` by default
-    ///
-    /// # Arguments
-    ///
-    /// `short` - A string slice that holds the short identifier of the flag
-    ///
-    /// `long` - A string slice that holds the long identifier of the flag
-    ///
-    /// `description` - A string slice that holds the description of the flag
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// command.add_string_flag("f", "ferris", "say hello from ferris");
-    /// ```
-    pub fn add_string_flag(&mut self, short: &str, long: &str, description: &str) {
-        self.add_flag(
-            short,
-            long,
-            description,
-            FlagValue::String(String::from("")),
-        );
-    }
-
-    /// Add a int flag for command with the arguments provided and value set to `0` by default
-    ///
-    /// # Arguments
-    ///
-    /// `short` - A string slice that holds the short identifier of the flag
-    ///
-    /// `long` - A string slice that holds the long identifier of the flag
-    ///
-    /// `description` - A string slice that holds the description of the flag
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// command.add_int_flag("f", "ferris", "say hello from ferris");
-    /// ```
-    pub fn add_int_flag(&mut self, short: &str, long: &str, description: &str) {
-        self.add_flag(short, long, description, FlagValue::Int(0));
-    }
-
-    /// Add a float flag for command with the arguments provided and value set to `0.0` by default
-    ///
-    /// # Arguments
-    ///
-    /// `short` - A string slice that holds the short identifier of the flag
-    ///
-    /// `long` - A string slice that holds the long identifier of the flag
-    ///
-    /// `description` - A string slice that holds the description of the flag
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// command.add_float_flag("f", "ferris", "say hello from ferris");
-    /// ```
-    pub fn add_float_flag(&mut self, short: &str, long: &str, description: &str) {
-        self.add_flag(short, long, description, FlagValue::Float(0.0));
+    pub fn add_flag(&mut self, flag: Flag) {
+        self.flags.push(flag);
     }
 }
 

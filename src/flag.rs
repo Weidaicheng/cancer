@@ -25,25 +25,25 @@ pub enum FlagValue {
     /// # Example
     ///
     /// ```
-    /// let value = FlagValue::String(String::from("Hello, world!"));
+    /// let value = FlagValue::String(Some(String::from("Hello, world!")));
     /// ```
-    String(String),
+    String(Option<String>),
     /// An int enum that represents for `i32` flag value
     ///
     /// # Example
     ///
     /// ```
-    /// let value = FlagValue::Int(3);
+    /// let value = FlagValue::Int(Some(3));
     /// ```
-    Int(i32),
+    Int(Option<i32>),
     /// A float enum that represents for `f32` flag value
     ///
     /// # Example
     ///
     /// ```
-    /// let value = FlagValue::Float(2.7);
+    /// let value = FlagValue::Float(Some(2.7));
     /// ```
-    Float(f32),
+    Float(Option<f32>),
 }
 
 /// A command flag type
@@ -108,13 +108,89 @@ impl Flag {
     /// ```
     /// let flag = Flag::new("f", "ferris", "say hello from ferris", FlagValue::Bool(false));
     /// ```
-    pub fn new(short: &str, long: &str, description: &str, value: FlagValue) -> Self {
+    fn new(short: &str, long: &str, description: &str, value: FlagValue) -> Self {
         Self {
             short: String::from(short),
             long: String::from(long),
             description: String::from(description),
             value,
         }
+    }
+
+    /// Returns a flag with bool(false by default) value and the arguments provided
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier
+    ///
+    /// `long` - A string slice that holds the long identifier
+    ///
+    /// `description` - A string slice that holds the description
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let flag = Flag::new_bool("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn new_bool(short: &str, long: &str, description: &str) -> Self {
+        Flag::new(short, long, description, FlagValue::Bool(false))
+    }
+
+    /// Returns a flag with string(None by default) value and the arguments provided
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier
+    ///
+    /// `long` - A string slice that holds the long identifier
+    ///
+    /// `description` - A string slice that holds the description
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let flag = Flag::new_string("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn new_string(short: &str, long: &str, description: &str) -> Self {
+        Flag::new(short, long, description, FlagValue::String(None))
+    }
+
+    /// Returns a flag with int(None by default) value and the arguments provided
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier
+    ///
+    /// `long` - A string slice that holds the long identifier
+    ///
+    /// `description` - A string slice that holds the description
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let flag = Flag::new_int("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn new_int(short: &str, long: &str, description: &str) -> Self {
+        Flag::new(short, long, description, FlagValue::Int(None))
+    }
+
+    /// Returns a flag with float(None by default) value and the arguments provided
+    ///
+    /// # Arguments
+    ///
+    /// `short` - A string slice that holds the short identifier
+    ///
+    /// `long` - A string slice that holds the long identifier
+    ///
+    /// `description` - A string slice that holds the description
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let flag = Flag::new_float("f", "ferris", "say hello from ferris");
+    /// ```
+    pub fn new_float(short: &str, long: &str, description: &str) -> Self {
+        Flag::new(short, long, description, FlagValue::Float(None))
     }
 }
 
