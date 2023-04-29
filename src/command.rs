@@ -1,6 +1,7 @@
 use std::env;
 
 use crate::{
+    help::{DefaultHelpRender, HelpRender},
     version::{DefaultVersionRender, VersionRender},
     PKG_NAME,
 };
@@ -19,15 +20,15 @@ pub struct Command {
     /// # Example
     ///
     /// gives a friendly hello
-    description: String,
+    pub description: String,
     /// Command usage
     ///
     /// # Example
     ///
     /// hello TEXt
-    usage: String,
+    pub usage: String,
     /// Command flags
-    flags: Vec<Flag>,
+    pub flags: Vec<Flag>,
     /// Command execution logic
     ///
     /// # Arguments
@@ -41,12 +42,14 @@ pub struct Command {
     /// |text, flags| { println!("hello, {}!", text.unwrap()); }
     /// ```
     run: fn(text: Option<String>, flags: Vec<&Flag>),
+    /// Help render which is a `HelpRender` trait that supports for rendering help information
+    help_render: Box<dyn HelpRender>,
     /// Version render which is a `VersionRender` trait that supports for rendering version information
     version_render: Box<dyn VersionRender>,
 }
 
 impl Command {
-    /// Returns a command with the arguments provided and help and version flags, also with default version render
+    /// Returns a command with the arguments provided and help and version flags, also with default help render and version render
     ///
     /// # Arguments
     ///
@@ -67,7 +70,8 @@ impl Command {
             usage: String::from(usage),
             run,
             flags: vec![],
-            version_render: Box::new(DefaultVersionRender {}),
+            help_render: Box::new(DefaultHelpRender::new()),
+            version_render: Box::new(DefaultVersionRender::new()),
         };
         command.add_boolean_flag(
             HELP_SHORT,
@@ -213,7 +217,7 @@ impl Command {
         }
 
         if args.len() <= 1 {
-            self.help();
+            println!("{}", self.help_render.help_text(self));
             return;
         }
 
@@ -310,7 +314,7 @@ impl Command {
                 match flag.value {
                     FlagValue::Bool(value) => {
                         if value {
-                            self.help();
+                            println!("{}", self.help_render.help_text(self));
                             exit = true;
                             break;
                         }
@@ -345,33 +349,5 @@ impl Command {
         }
 
         exit
-    }
-}
-
-impl Command {
-    /// Print help document
-    ///
-    /// # Example
-    ///
-    /// command description
-    ///
-    /// Usage:
-    ///
-    ///       command TEXT
-    ///
-    /// Flags:
-    ///
-    ///       -h, --help        help for command
-    ///       -v, --version     version for command
-    pub fn help(&self) {
-        println!("{}", self.description);
-        println!();
-        println!("Usage:");
-        println!("  {}", self.usage);
-        println!();
-        println!("Flags:");
-        for flag in self.flags.iter() {
-            println!("{}", flag);
-        }
     }
 }
