@@ -98,7 +98,7 @@ impl Command {
     /// # Examples
     ///
     /// ```
-    /// command.add_flag(Flag::new("f", "ferris", "say hello from ferris", FlagValue::Bool(false)));
+    /// command.add_flag(Flag::new_bool("f", "ferris", "say hello from ferris"));
     /// ```
     pub fn add_flag(&mut self, flag: Flag) {
         self.flags.push(flag);
