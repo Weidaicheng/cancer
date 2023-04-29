@@ -1,6 +1,7 @@
 pub mod command;
 pub mod flag;
 pub mod help;
+pub mod util;
 pub mod version;
 
 use std::env;

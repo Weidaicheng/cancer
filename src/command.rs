@@ -1,7 +1,6 @@
-use std::env;
-
 use crate::{
     help::{DefaultHelpRender, HelpRender},
+    util::get_args,
     version::{DefaultVersionRender, VersionRender},
     PKG_NAME,
 };
@@ -117,7 +116,7 @@ impl Command {
     /// command.execute();
     /// ```
     pub fn execute(&mut self) {
-        let args = self.get_args();
+        let args = get_args();
 
         let args = self.update_flags(args.iter().map(|x| &x[..]).collect());
 
@@ -136,11 +135,6 @@ impl Command {
         let input = &args[1];
         let flags = self.get_flags();
         (self.run)(Some(String::from(input)), flags);
-    }
-
-    /// Get args from env
-    fn get_args(&self) -> Vec<String> {
-        env::args().collect()
     }
 
     /// Update flags value by giving args and returns simple args vector without any flag
