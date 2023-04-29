@@ -1,5 +1,6 @@
 pub mod command;
 pub mod flag;
+pub mod version;
 
 use std::env;
 

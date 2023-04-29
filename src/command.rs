@@ -1,6 +1,9 @@
 use std::env;
 
-use crate::{PKG_NAME, PKG_VERSION};
+use crate::{
+    version::{DefaultVersionRender, VersionRender},
+    PKG_NAME,
+};
 
 use super::flag::{is_flag, Flag, FlagValue};
 
@@ -38,10 +41,12 @@ pub struct Command {
     /// |text, flags| { println!("hello, {}!", text.unwrap()); }
     /// ```
     run: fn(text: Option<String>, flags: Vec<&Flag>),
+    /// Version render which is a `VersionRender` trait that supports for rendering version information
+    version_render: Box<dyn VersionRender>,
 }
 
 impl Command {
-    /// Returns a command with the arguments provided and help and version flags
+    /// Returns a command with the arguments provided and help and version flags, also with default version render
     ///
     /// # Arguments
     ///
@@ -57,11 +62,12 @@ impl Command {
     /// });
     /// ```
     pub fn new(description: &str, usage: &str, run: fn(Option<String>, Vec<&Flag>)) -> Self {
-        let mut command = Command {
+        let mut command = Self {
             description: String::from(description),
             usage: String::from(usage),
             run,
             flags: vec![],
+            version_render: Box::new(DefaultVersionRender {}),
         };
         command.add_boolean_flag(
             HELP_SHORT,
@@ -328,7 +334,7 @@ impl Command {
                 match flag.value {
                     FlagValue::Bool(value) => {
                         if value {
-                            self.version();
+                            println!("{}", self.version_render.version_text(self));
                             exit = true;
                             break;
                         }
@@ -367,14 +373,5 @@ impl Command {
         for flag in self.flags.iter() {
             println!("{}", flag);
         }
-    }
-
-    /// Print version information
-    ///
-    /// # Example
-    ///
-    /// command version 1.0.0
-    pub fn version(&self) {
-        println!("{} version {}", PKG_NAME, PKG_VERSION);
     }
 }
