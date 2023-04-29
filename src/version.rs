@@ -22,7 +22,7 @@ pub trait VersionRender {
     fn version_text(&self, command: &Command) -> String;
 }
 
-/// A that that supports for default version rendering
+/// A type that supports for default version rendering
 ///
 /// # Example
 ///
