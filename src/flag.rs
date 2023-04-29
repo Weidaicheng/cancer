@@ -10,7 +10,7 @@ pub const FLAG_LONG_START: &str = "--";
 /// ```
 /// let value = FlagValue::Bool(true);
 /// ```
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum FlagValue {
     /// An boolean enum that represents for `bool` flag value
     ///
@@ -117,7 +117,7 @@ impl Flag {
         }
     }
 
-    /// Returns a flag with bool(false by default) value and the arguments provided
+    /// Returns a flag with bool(`false` by default) value and the arguments provided
     ///
     /// # Arguments
     ///
@@ -136,7 +136,7 @@ impl Flag {
         Flag::new(short, long, description, FlagValue::Bool(false))
     }
 
-    /// Returns a flag with string(None by default) value and the arguments provided
+    /// Returns a flag with string(`None` by default) value and the arguments provided
     ///
     /// # Arguments
     ///
@@ -155,7 +155,7 @@ impl Flag {
         Flag::new(short, long, description, FlagValue::String(None))
     }
 
-    /// Returns a flag with int(None by default) value and the arguments provided
+    /// Returns a flag with int(`None` by default) value and the arguments provided
     ///
     /// # Arguments
     ///
@@ -174,7 +174,7 @@ impl Flag {
         Flag::new(short, long, description, FlagValue::Int(None))
     }
 
-    /// Returns a flag with float(None by default) value and the arguments provided
+    /// Returns a flag with float(`None` by default) value and the arguments provided
     ///
     /// # Arguments
     ///
@@ -243,4 +243,45 @@ impl Flag {
 /// ```
 pub fn is_flag(arg: &str) -> bool {
     arg.starts_with(FLAG_SHORT_START) || arg.starts_with(FLAG_LONG_START)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new() {
+        let short = "t";
+        let long = "test";
+        let description = "test description";
+        let value = FlagValue::Bool(false);
+        let flag = Flag::new(short, long, description, value);
+        assert_eq!(flag.short, short);
+        assert_eq!(flag.long, long);
+        assert_eq!(flag.description, description);
+    }
+
+    #[test]
+    fn new_bool() {
+        let flag = Flag::new_bool("t", "test", "test description");
+        assert_eq!(flag.value, FlagValue::Bool(false));
+    }
+
+    #[test]
+    fn new_string() {
+        let flag = Flag::new_string("t", "test", "test description");
+        assert_eq!(flag.value, FlagValue::String(None));
+    }
+
+    #[test]
+    fn new_int() {
+        let flag = Flag::new_int("t", "test", "test description");
+        assert_eq!(flag.value, FlagValue::Int(None));
+    }
+
+    #[test]
+    fn new_float() {
+        let flag = Flag::new_float("t", "test", "test description");
+        assert_eq!(flag.value, FlagValue::Float(None));
+    }
 }
